@@ -1,0 +1,14 @@
+{
+    "name": "tcpadmin/ease-mob-sdk",
+    "description": "第三方环信SDK",
+    "type": "library",
+    "autoload": {
+		"psr-4": {
+			"tcpadmin\\EaseMobSdk\\": "src"
+		}
+    },
+    "require": {
+        "ext-json": "*",
+        "php-curl-class/php-curl-class": "^8.6"
+    }
+}
