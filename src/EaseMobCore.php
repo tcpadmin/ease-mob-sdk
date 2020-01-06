@@ -5,12 +5,19 @@ use Curl\Curl;
 
 class EaseMobCore
 {
+    const LOG_DEBUG = 1;
+    const LOG_WARN = 2;
+    const LOG_ERROR = 3;
+    const LOG_NONE = 4;
+
     private $curl;
     private $host = 'http://a1.easemob.com';
     private $orgName = '';
     private $appName = '';
     private $clientId = '';
     private $clientSecret = '';
+    private $logPath = '';
+    private $logLevel = self::LOG_ERROR;
 
     private $token;
 
@@ -37,7 +44,7 @@ class EaseMobCore
 
     public function adminRequest($method, $url, $data=[]){
         if(!$this->token){
-            $this->log('Empty Token!');
+            $this->log(self::LOG_ERROR, 'Empty Token!');
             return false;
         }
         $this->curl->setHeader('Authorization', "Bearer {$this->token}");
@@ -64,31 +71,20 @@ class EaseMobCore
                 return false;
         }
         if($curl->error){
-            $this->log('Request Exception',[
+            $this->log(self::LOG_ERROR, 'Request Exception',[
                 'url'=>$url, 'data'=>$data, 'code'=>$curl->errorCode, 'msg'=>$curl->errorMessage, 'res'=>$curl->getRawResponse(),
             ]);
             return false;
         }
         $res = json_decode($curl->getRawResponse(), true);
         if(!empty($res['error'])){
-            $this->log('Request Fail',['url'=>$url, 'data'=>$data, 'res'=>$curl->getRawResponse()]);
+            $this->log(self::LOG_ERROR, 'Request Fail',['url'=>$url, 'data'=>$data, 'res'=>$curl->getRawResponse()]);
             return false;
         }
+        $this->log(self::LOG_DEBUG, 'Request', ['url'=>$url, 'data'=>$data, 'res'=>$curl->getRawResponse()]);
         return $res;
     }
 
-    /*private function getTokenFromCache(){
-        return false;
-    }
-    private function cacheToken($token){
-        return false;
-    }
-    private function getLock(){
-        return true;
-    }
-    private function releaseLock(){
-        return true;
-    }*/
     public function fetchToken(){
         $tokenRes = $this->request('post','token', [
             'grant_type' => 'client_credentials',
@@ -101,26 +97,14 @@ class EaseMobCore
         return $tokenRes;
     }
 
-    /*public function getToken($times=0){
-        if($this->token)return $this->token;
-
-        $token = $this->getTokenFromCache();
-        if($token) return $token;
-
-        if($this->getLock()){
-            $token = $this->getTokenNoCache();
-            $this->releaseLock();
-            return $token;
-        }
-        if($times < 3){
-            //sleep 100ms
-            usleep(100000);
-            return $this->getToken($times+1);
-        }
-        return false;
-    }*/
-
-    private function log($str, $context=[]){
-        var_dump($str, $context);
+    private function log($level, $str, $context=[]){
+        if($this->logLevel > $level || !$this->logPath) return;
+        $levelMark = [
+            self::LOG_DEBUG => 'DEBUG',
+            self::LOG_WARN => 'WARN',
+            self::LOG_ERROR => 'ERROR',
+        ];
+        $logStr = sprintf("%s|%s[%s]%s\n", date('Y-m-d H:i:s'), $levelMark[$level], $str, json_encode($context));
+        file_put_contents($this->logPath, $logStr, FILE_APPEND);
     }
 }
