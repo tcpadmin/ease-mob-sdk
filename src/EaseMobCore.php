@@ -33,6 +33,10 @@ class EaseMobCore
         }
     }
 
+    public function getToken(){
+        return $this->token;
+    }
+
     public function setToken($token){
         $this->token = $token;
         return $this;
@@ -85,6 +89,11 @@ class EaseMobCore
         return $res;
     }
 
+    /**
+     * 获取token
+     * @link http://docs-im.easemob.com/im/server/ready/user#%E8%8E%B7%E5%8F%96%E7%AE%A1%E7%90%86%E5%91%98%E6%9D%83%E9%99%90
+     * @return bool|mixed
+     */
     public function fetchToken(){
         $tokenRes = $this->request('post','token', [
             'grant_type' => 'client_credentials',

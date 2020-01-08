@@ -9,11 +9,24 @@ class EaseMobSdk{
     private static $instanceMessage;
 
     /**
+     * 如果已存在就忽略
      * @param $config
      * @param string $label
      * @return EaseMobCore
      */
     public static function init($config, $label='default'){
+        if(empty(self::$instanceCore[$label])){
+            return self::initForce($config, $label);
+        }
+        return self::$instanceCore[$label];
+    }
+
+    /**
+     * @param $config
+     * @param string $label
+     * @return EaseMobCore
+     */
+    public static function initForce($config, $label='default'){
         $tmp = new EaseMobCore($config);
         self::$instanceCore[$label] = $tmp;
         return $tmp;
