@@ -2,6 +2,7 @@
     "name": "tcpadmin/ease-mob-sdk",
     "description": "第三方环信SDK",
     "type": "library",
+    "license": "MIT",
     "autoload": {
 		"psr-4": {
 			"tcpadmin\\EaseMobSdk\\": "src"
