@@ -21,9 +21,12 @@ class EaseMobCore
 
     private $token;
 
+    public $easeError;
+    public $easeException;
+
     public function __construct($config=[]){
-        foreach(['host','orgName', 'appName', 'clientId', 'clientSecret'] as $k){
-            if(!isset($config[$k])) continue;
+        foreach(['host','orgName', 'appName', 'clientId', 'clientSecret','logPath', 'logLevel'] as $k){
+            if(!array_key_exists($config, $k)) continue;
             $this->$k = $config[$k];
         }
 
@@ -55,7 +58,18 @@ class EaseMobCore
         return $this->request($method, $url, $data);
     }
 
+    /**
+     * 每次请求前都要清理上次的错误日志
+     */
+    private function clearError(){
+        $this->easeError = null;
+        $this->easeException = null;
+    }
+
     public function request($method, $url, $data=[]){
+        //每次请求前都要清理上次的错误日志
+        $this->clearError();
+
         if(strpos($url,'/')!==0){
             $url = "{$this->host}/{$this->orgName}/{$this->appName}/$url";
         }
@@ -74,18 +88,24 @@ class EaseMobCore
             default:
                 return false;
         }
-        if($curl->error){
+
+        $responseRaw = $curl->getRawResponse();
+        $res = json_decode($responseRaw, true);
+        //curl请求失败
+        if(!$res){
             $this->log(self::LOG_ERROR, 'Request Exception',[
-                'url'=>$url, 'data'=>$data, 'code'=>$curl->errorCode, 'msg'=>$curl->errorMessage, 'res'=>$curl->getRawResponse(),
+                'url'=>$url, 'data'=>$data, 'code'=>$curl->errorCode, 'msg'=>$curl->errorMessage, 'res'=>$responseRaw,
             ]);
             return false;
         }
-        $res = json_decode($curl->getRawResponse(), true);
+        //业务失败
         if(!empty($res['error'])){
-            $this->log(self::LOG_ERROR, 'Request Fail',['url'=>$url, 'data'=>$data, 'res'=>$curl->getRawResponse()]);
+            $this->easeError = $res['error'];
+            $this->easeException = $res['exception'];
+            $this->log(self::LOG_ERROR, 'Request Fail',['url'=>$url, 'data'=>$data, 'res'=>$res]);
             return false;
         }
-        $this->log(self::LOG_DEBUG, 'Request', ['url'=>$url, 'data'=>$data, 'res'=>$curl->getRawResponse()]);
+        $this->log(self::LOG_DEBUG, 'Request', ['url'=>$url, 'data'=>$data, 'res'=>$responseRaw]);
         return $res;
     }
 
@@ -101,7 +121,7 @@ class EaseMobCore
             'client_secret' => $this->clientSecret,
         ]);
         if($tokenRes){
-            $this->token = $tokenRes['accessToken'];
+            $this->token = $tokenRes['access_token'];
         }
         return $tokenRes;
     }
