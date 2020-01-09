@@ -3,4 +3,7 @@
 .DS_Store
 composer.lock
 local-script
-tests/config.php
+/config.php
+/token.php
+*.log
+/phpunit.*.phar

@@ -26,7 +26,7 @@ class EaseMobCore
 
     public function __construct($config=[]){
         foreach(['host','orgName', 'appName', 'clientId', 'clientSecret','logPath', 'logLevel'] as $k){
-            if(!array_key_exists($config, $k)) continue;
+            if(!array_key_exists($k, $config)) continue;
             $this->$k = $config[$k];
         }
 
@@ -34,6 +34,7 @@ class EaseMobCore
         if(!empty($config['proxyHost']) && !empty($config['proxyPort'])){
             $this->curl->setProxy($config['proxyHost'], $config['proxyPort']);
         }
+        $this->curl->setTimeout($config['timeout']??3);
     }
 
     public function getToken(){

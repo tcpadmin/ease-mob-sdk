@@ -25,7 +25,7 @@ abstract class AbstractMsg{
     /**
      * @var string 目标类型
      */
-    private $targetType;
+    private $targetType = self::targetTypeUsers;
 
     public function setTargetType($targetType){
         if(!in_array($targetType, [self::targetTypeUsers, self::targetTypeGroups, self::targetTypeRooms])){
@@ -52,7 +52,18 @@ abstract class AbstractMsg{
      */
     public $from = 'admin';
 
-    abstract function getMsgType();
+    public abstract function getMsgType();
+
+    protected abstract function getMsgData();
+
+    public function getBody(){
+        return [
+            'target_type' => $this->getTargetType(),
+            'target' => $this->getTarget(),
+            'from' => $this->from,
+            'msg' => $this->getMsgData(),
+        ];
+    }
 
     /**
      * 添加收件人

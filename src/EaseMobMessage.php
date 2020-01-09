@@ -1,7 +1,7 @@
 <?php
 namespace tcpadmin\EaseMobSdk;
 
-use Curl\Curl;
+use tcpadmin\EaseMobSdk\message\AbstractMsg;
 
 class EaseMobMessage{
     /**
@@ -13,4 +13,7 @@ class EaseMobMessage{
         $this->core = $core;
     }
 
+    public function adminSend(AbstractMsg $msg){
+        return $this->core->adminRequest('post', 'messages', $msg->getBody());
+    }
 }

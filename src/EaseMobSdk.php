@@ -35,10 +35,11 @@ class EaseMobSdk{
     /**
      * @param string $label
      * @return EaseMobCore
+     * @throws \Exception
      */
     public static function core($label='default'){
         if(empty(self::$instanceCore[$label])){
-            return null;
+            throw new \Exception('Instance has not been initialized');
         }
         return self::$instanceCore[$label];
     }
@@ -58,7 +59,7 @@ class EaseMobSdk{
      * @param string $label
      * @return EaseMobMessage
      */
-    public static function messageModule($label){
+    public static function messageModule($label='default'){
         if(empty(self::$instanceMessage[$label])){
             self::$instanceMessage[$label] = new EaseMobMessage(self::core($label));
         }
