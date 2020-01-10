@@ -78,9 +78,11 @@ class EaseMobCore
         switch(strtoupper($method)){
             case 'POST':
                 $curl->setHeader('Content-Type', 'application/json');
+            case 'FILE':
                 $curl->post($url, $data);
                 break;
             case 'GET':
+                $curl->setHeader('Content-Type', 'application/json');
                 $curl->get($url);
                 break;
             case 'DELETE':
@@ -94,6 +96,8 @@ class EaseMobCore
         $res = json_decode($responseRaw, true);
         //curl请求失败
         if(!$res){
+            $this->easeError = 'HttpError';
+            $this->easeException = 'RequestException';
             $this->log(self::LOG_ERROR, 'Request Exception',[
                 'url'=>$url, 'data'=>$data, 'code'=>$curl->errorCode, 'msg'=>$curl->errorMessage, 'res'=>$responseRaw,
             ]);
@@ -102,7 +106,7 @@ class EaseMobCore
         //业务失败
         if(!empty($res['error'])){
             $this->easeError = $res['error'];
-            $this->easeException = $res['exception'];
+            $this->easeException = $res['exception'] ?? '';
             $this->log(self::LOG_ERROR, 'Request Fail',['url'=>$url, 'data'=>$data, 'res'=>$res]);
             return false;
         }
@@ -134,7 +138,7 @@ class EaseMobCore
             self::LOG_WARN => 'WARN',
             self::LOG_ERROR => 'ERROR',
         ];
-        $logStr = sprintf("%s|%s[%s]%s\n", date('Y-m-d H:i:s'), $levelMark[$level], $str, json_encode($context));
+        $logStr = sprintf("%s[%s]%s|%s\n", date('Y-m-d H:i:s'), $levelMark[$level], $str, json_encode($context));
         file_put_contents($this->logPath, $logStr, FILE_APPEND);
     }
 }

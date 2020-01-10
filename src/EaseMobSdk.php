@@ -8,6 +8,8 @@ class EaseMobSdk{
 
     private static $instanceMessage;
 
+    private static $instanceFile;
+
     /**
      * 如果已存在就忽略
      * @param $config
@@ -64,5 +66,16 @@ class EaseMobSdk{
             self::$instanceMessage[$label] = new EaseMobMessage(self::core($label));
         }
         return self::$instanceMessage[$label];
+    }
+
+    /**
+     * @param string $label
+     * @return EaseMobFile
+     */
+    public static function fileModule($label='default'){
+        if(empty(self::$instanceFile[$label])){
+            self::$instanceFile[$label] = new EaseMobFile(self::core($label));
+        }
+        return self::$instanceFile[$label];
     }
 }

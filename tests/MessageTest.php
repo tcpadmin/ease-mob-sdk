@@ -15,4 +15,10 @@ class MessageTest extends TestCase
         $res = $msgModule->adminSend($msg);
         $this->assertNotFalse($res);
     }
+
+    public function testHistory(){
+        EaseMobHelper::initAdminSdk();
+        $msgModule = EaseMobSdk::messageModule();
+        $msgModule->history(202001);
+    }
 }

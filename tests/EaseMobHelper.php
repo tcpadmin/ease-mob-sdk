@@ -24,13 +24,13 @@ class EaseMobHelper{
         if(!file_exists($tokenFile)){
             $token = self::initSdk()->fetchToken();
             if($token && $token['access_token']){
-                $token['expire_in'] = time() + $token['expire_in'];
+                $token['expires_in'] = time() + $token['expires_in'];
                 file_put_contents($tokenFile, json_encode($token));
             }
         }else{
             $token = file_get_contents($tokenFile);
             $token = json_decode($token, true);
-            if(!$token || $token['expire_in']>time()){
+            if(!$token || $token['expires_in']>time()){
                 unlink($tokenFile);
                 return self::getToken();
             }

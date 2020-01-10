@@ -6,4 +6,4 @@ local-script
 /config.php
 /token.php
 *.log
-/phpunit.*.phar
+*.phar
