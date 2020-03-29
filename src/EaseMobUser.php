@@ -42,4 +42,14 @@ class EaseMobUser{
     public function destroy($username){
         return $this->core->adminRequest('delete', "users/$username");
     }
+
+    /**
+     * 获取单个用户信息
+     * @link http://docs-im.easemob.com/im/server/ready/user#%E8%8E%B7%E5%8F%96%E5%8D%95%E4%B8%AA%E7%94%A8%E6%88%B7
+     * @param $username
+     * @return bool|mixed
+     */
+    public function user($username){
+        return $this->core->adminRequest('get', "users/$username");
+    }
 }
